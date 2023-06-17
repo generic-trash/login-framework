@@ -15,11 +15,9 @@ class UserDBTests(unittest.TestCase):
         self.userdb.add_user("baseUser", self.baseEmail, "fried", "fried")
 
     def test_add_user(self):
-        status = self.userdb.add_user("hello", self.baseEmail, "fried", "fried")
+        status = self.userdb.add_user("hello", self.baseEmail, "fried")
         assert status['status'] == 200
-        status = self.userdb.add_user("bye", self.baseEmail, "fried", "fride")
-        assert status['status'] == 400
-        status = self.userdb.add_user("hello", self.baseEmail, "fried", "fried")
+        status = self.userdb.add_user("hello", self.baseEmail, "baked")
         assert status['status'] == 409
 
     def test_del_user(self):

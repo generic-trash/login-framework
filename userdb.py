@@ -40,18 +40,16 @@ class UserDB(BaseDB):
     def if_user_exists(func):
         def validate_wrapper(self, username, *args, **kwargs):
             if username not in self.data:
-                return dict(status=404, error="User Not Found")
+                return dict(status=404, description="User Not Found")
             else:
                 return func(self, username, *args, **kwargs)
 
         return validate_wrapper
 
     @serialize
-    def add_user(self, username, email, password, confirm):
-        if password != confirm:
-            return dict(status=400, error="Passwords do not Match")
+    def add_user(self, username, email, password):
         if username in self.data:
-            return dict(status=409, error="User already exists")
+            return dict(status=409, description="User already exists")
         self.data[username] = {
             "email": email,
             "password": password,
@@ -112,3 +110,4 @@ class UserDB(BaseDB):
     @ok
     def set_email(self, username, email):
         self.data[username]["email"] = email
+
