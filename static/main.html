@@ -12,6 +12,7 @@
 <div class="whoami">
     <span id="username"></span>
 </div>
+<hr>
 <div class="changepass">
     <form id="changepass">
         <input type="password" name="current"><br>
@@ -22,21 +23,54 @@
         <span class="error"></span>
     </form>
 </div>
-<div class="publicdata"></div>
-<div class="privatedata"></div>
+<hr>
+<div class="publicdata">
+    <form id="publicdata">
+        <textarea name="publicdata"></textarea> <br>
+        <input type="submit" value="Save"><br>
+        <span class="error"></span>
+    </form>
+</div>
+<hr>
+<div class="privatedata">
+    <form id="privatedata">
+        <textarea name="privatedata"></textarea> <br>
+        <input type="submit" value="Save"><br>
+        <span class="error"></span>
+    </form>
+</div>
+<hr>
 <div class="email">
     <form id="email">
         <input type="email" name="email">
         <input value="Submit" type="submit">
         <span class="error"></span>
     </form>
-
 </div>
-
+<hr>
 <button id="logout">Logout</button>
 
 <script>
 $(() => {
+  // Public Data GET
+    fetch("/me/publicdata")
+    .then(res => res.json())
+    .then(res => {
+        if (res.status == 200) $("textarea[name=publicdata]").val(JSON.stringify(res.data))
+        else $("#publicdata .error").text(res.description);
+    })
+    .catch(err => {console.log(err)})
+  // Private Data GET
+
+    fetch("/me/privatedata")
+    .then(res => res.json())
+    .then(res => {
+        if (res.status == 200) $("textarea[name=privatedata]").val(JSON.stringify(res.data))
+        else $("#privatedata .error").text(res.description);
+    })
+    .catch(err => {console.log(err)})
+  // Whoami GET
+
     fetch("/whoami")
     .then(res => res.json())
     .then(res => {
@@ -45,11 +79,17 @@ $(() => {
         else $("#username").text(res.username);
     })
     .catch(err => {console.log(err)})
+
+      // Email GET
+
     fetch("/me/email")
     .then(res => res.json())
     .then(res => {
         if(res.status == 200) $("#email input[name=email]").val(res.data)
     }).catch(err => {console.log(err)})
+
+      // Email  SET
+
     $("#email").submit(e => {
         e.preventDefault();
         fetch("/me/email", {
@@ -68,6 +108,9 @@ $(() => {
         .catch(err => {console.log(err)})
 
     });
+
+    // Password SET
+
     $("#changepass").submit(e => {
             e.preventDefault();
             fetch('/changepassword', {
@@ -93,22 +136,55 @@ $(() => {
                 console.error(err);
               });
 })
-$("#logout").click(e => {
-    e.preventDefault();
-    fetch("/logout", {
-        method: "POST",
+// Logout
+    $("#logout").click(e => {
+        e.preventDefault();
+        fetch("/logout", {
+            method: "POST",
+        })
+        .then(res => res.json())
+        .then(res => {
+            if (res.status != 200) throw new Error("logout failed");
+            else window.location.href = "/login.html";
+        })
+        .catch(err => {console.error(err)});
     })
-    .then(res => res.json())
-    .then(res => {
-        if (res.status != 200) throw new Error("Whoami failed");
-        else window.location.href = "/login.html";
+    // Public data SET
+    $("#publicdata").submit(e => {
+        e.preventDefault();
+        fetch("/me/publicdata", {
+            method: "POST",
+            body: $("textarea[name=publicdata]").val(),
+            headers: {
+                'Content-Type': 'application/json'
+              }
+        })
+        .then(res => res.json())
+        .then(res => {
+            if (res.status != 200) $("#publicdata .error").text(res.description);
+        })
+        .catch(err => {console.log(err)})
     })
-    .catch(err => {
-              console.log("error");
-                console.error(err);
-              });
+
+    // Private data SET
+    $("#privatedata").submit(e => {
+        e.preventDefault();
+        fetch("/me/privatedata", {
+            method: "POST",
+            body: $("textarea[name=privatedata]").val(),
+            headers: {
+                'Content-Type': 'application/json'
+              }
+        })
+        .then(res => res.json())
+        .then(res => {
+            if (res.status != 200) $("#privatedata .error").text(res.description);
+        })
+        .catch(err => {console.log(err)})
+    })
 })
-})
+
+
 
 </script>
 </body>
