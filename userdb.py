@@ -47,6 +47,7 @@ class UserDB(BaseDB):
         return validate_wrapper
 
     @serialize
+    @ok
     def add_user(self, username, email, password):
         if username in self.data:
             return dict(status=409, description="User already exists")
@@ -56,7 +57,6 @@ class UserDB(BaseDB):
             "publicdata": {},
             "privatedata": {}
         }
-        return dict(status=200)
 
     @serialize
     @if_user_exists
@@ -111,3 +111,8 @@ class UserDB(BaseDB):
     def set_email(self, username, email):
         self.data[username]["email"] = email
 
+    @serialize
+    @if_user_exists
+    @ok
+    def set_password(self, username, password):
+        self.data[username]["password"] = password

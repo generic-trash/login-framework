@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <script
+            src="https://code.jquery.com/jquery-3.7.0.min.js"
+            integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g="
+            crossorigin="anonymous"></script>
+
+</head>
+<body>
+<form id="register">
+
+    <input type="text" name="username" id="username"/><br/>
+    <input type="email" name="email" id="email"/><br/>
+    <input type="password" name="password" id="password"/><br/>
+    <input type="password" name="confirm" id="confirm"/><br/>
+    <input type="submit" value="Submit"><br/>
+    <span id="error"></span>
+</form>
+<script>
+    $(() => {
+        let form = $("#register");
+        form.submit(e => {
+            e.preventDefault();
+            fetch('/register', {
+              method: 'POST',
+              body: JSON.stringify({
+                username: $('#register input[name="username"]').val(),
+                password: $('#register input[name="password"]').val(),
+                confirm: $('#register input[name="confirm"]').val(),
+                email: $('#register input[name="email"]').val()
+              }),
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            })
+              .then(res => res.json())
+              .then(data => {
+                if (data.status == 200) {
+                    window.location.href = "/main.html";
+                } else {
+                    $("#error").text(data.description);
+                }
+              })
+              .catch(err => {
+              console.log("error");
+                console.error(err);
+              });
+        })
+    })
+</script>
+</body>
+</html>

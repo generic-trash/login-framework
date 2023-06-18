@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PublicUserData</title>
+  <script
+            src="https://code.jquery.com/jquery-3.7.0.min.js"
+            integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g="
+            crossorigin="anonymous"></script>
+</head>
+<body>
+  <div id="publicuserdata"></div>
+  <span id="error" style="color: red;"></span>
+  <script>
+    $(() => {
+    fetch("/users/hello/publicdata", {
+      method: 'GET',
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.status == 200) $("#publicuserdata").text(JSON.stringify(res.data));
+      else $("#error").text(res.description);
+     }).catch(err => {
+      console.log(err)
+     })
+    })
+  </script>
+</body>
+</html>

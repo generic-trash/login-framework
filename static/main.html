@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Main</title>
+    <script
+            src="https://code.jquery.com/jquery-3.7.0.min.js"
+            integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g="
+            crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="whoami">
+    <span id="username"></span>
+</div>
+<div class="changepass">
+    <form id="changepass">
+        <input type="password" name="current"><br>
+        <input type="password" name="password"><br>
+
+        <input type="password" name="confirm"><br>
+        <input type="submit"/><br/>
+        <span class="error"></span>
+    </form>
+</div>
+<div class="publicdata"></div>
+<div class="privatedata"></div>
+<div class="email">
+    <form id="email">
+        <input type="email" name="email">
+        <input value="Submit" type="submit">
+        <span class="error"></span>
+    </form>
+
+</div>
+
+<button id="logout">Logout</button>
+
+<script>
+$(() => {
+    fetch("/whoami")
+    .then(res => res.json())
+    .then(res => {
+        if (res.status != 200) throw new Error("Whoami failed");
+        if (res.unauthenticated) $("#username").text("unauthenticated");
+        else $("#username").text(res.username);
+    })
+    .catch(err => {console.log(err)})
+    fetch("/me/email")
+    .then(res => res.json())
+    .then(res => {
+        if(res.status == 200) $("#email input[name=email]").val(res.data)
+    }).catch(err => {console.log(err)})
+    $("#email").submit(e => {
+        e.preventDefault();
+        fetch("/me/email", {
+            method: "POST",
+            body: JSON.stringify({
+                email: $("#email input[name=email]").val()
+              }),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(res => res.json())
+        .then(res => {
+            if (res.status != 200) $("#email .error").text(res.description);
+        })
+        .catch(err => {console.log(err)})
+
+    });
+    $("#changepass").submit(e => {
+            e.preventDefault();
+            fetch('/changepassword', {
+              method: 'POST',
+              body: JSON.stringify({
+                confirm: $('#changepass input[name="confirm"]').val(),
+                password: $('#changepass input[name="password"]').val(),
+                current: $('#changepass input[name="current"]').val(),
+              }),
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            })
+              .then(res => res.json())
+              .then(data => {
+                if (data.status == 200) {
+                } else {
+                    $("#changepass .error").text(data.description);
+                }
+              })
+              .catch(err => {
+              console.log("error");
+                console.error(err);
+              });
+})
+$("#logout").click(e => {
+    e.preventDefault();
+    fetch("/logout", {
+        method: "POST",
+    })
+    .then(res => res.json())
+    .then(res => {
+        if (res.status != 200) throw new Error("Whoami failed");
+        else window.location.href = "/login.html";
+    })
+    .catch(err => {
+              console.log("error");
+                console.error(err);
+              });
+})
+})
+
+</script>
+</body>
+</html>
