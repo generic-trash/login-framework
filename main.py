@@ -54,6 +54,7 @@ def logout():
 def get_publicdata1(username):
     return userdb.get_public_data(username)
 
+
 @app.get("/whoami")
 @as_json
 def get_whoami():
@@ -61,6 +62,8 @@ def get_whoami():
         return dict(status=200, unauthenticated=True)
     else:
         return dict(status=200, unauthenticated=False, username=sessionman.get_session(request.cookies["onionauth"]))
+
+
 @app.get("/me/publicdata")
 @as_json
 def get_publicdata():
